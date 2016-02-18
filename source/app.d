@@ -17,6 +17,9 @@ class SDLGame
     // The surface containing our hero sprite
     private SDL_Surface* hero_surface;
 
+    // The rectangle containing position and dimension information about our hero surface
+    private SDL_Rect* hero_rect;
+
     // Constructor - initializes resources
     this ( )
     {
@@ -34,6 +37,10 @@ class SDLGame
         auto hero_img_path = toStringz("hero.jpg"); // Needs to be a C string so can't be a compile time constant
         this.hero_surface = IMG_Load(hero_img_path);
         enforce(this.hero_surface !is null, "Couldn't load hero sprite");
+
+        // Create our hero surface's rectangle
+        // The hero rectangle contains the x and y position of the sprite, width and height can be 0 since we will be copying the whole surface
+        this.hero_rect = new SDL_Rect(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
 
         // Create our window where we render stuff
         auto window_title = toStringz("An SDL game written in D!"); // Needs to be a C string so can't be a compile time constant
@@ -62,12 +69,6 @@ class SDLGame
     // Run the game
     void run ( )
     {
-        // Render our hero onto the center-ish of the window surface
-        auto src_rect = null; // The source rectangle to copy from, null copies the entire surface
-        auto dst_rect = new SDL_Rect(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2); // The destination rectangle contains the x and y position of the sprite, width and height can be 0 since we are copying the whole surface
-        enforce(SDL_BlitSurface(this.hero_surface, src_rect, this.window_surface, dst_rect) == 0, "Couldn't draw the hero surface");
-        enforce(SDL_UpdateWindowSurface(this.window) == 0, "Couldn't update the window surface");
-
         // Wait for the player to quit
         bool quit;
         SDL_Event event;
@@ -81,8 +82,37 @@ class SDLGame
                     quit = true;
                     break;
                 }
+                else if ( event.type == SDL_KEYDOWN )
+                {
+                    this.handleInput();
+                }
+
+                // Clear the window surface by filling it with black pixels
+                auto fill_rect = null; // If the rectangle parameter is null, the whole surface is filled
+                enum CLEAR_COLOR = 0x00000000;
+                enforce(SDL_FillRect(this.window_surface, fill_rect, CLEAR_COLOR) == 0, "Coulnd't clear the window surface");
+
+                // Render our hero onto the center-ish of the window surface
+                auto src_rect = null; // The source rectangle to copy from, null copies the entire surface
+                enforce(SDL_BlitSurface(this.hero_surface, src_rect, this.window_surface, this.hero_rect) == 0, "Couldn't draw the hero surface");
+                enforce(SDL_UpdateWindowSurface(this.window) == 0, "Couldn't update the window surface");
             }
         }
+    }
+
+    // Handle player input
+    void handleInput ( )
+    {
+        // Get the keyboard state so we can handle simultaneous key presses
+        // The parameter is an optional int pointer that receives the length of the returned array - we don't need this at the moment
+        auto key_state = SDL_GetKeyboardState(null);
+        enforce(key_state !is null, "Couldn't get the keyboard state");
+
+        // Move the hero with WASD
+        if ( key_state[SDL_SCANCODE_W] > 0 ) this.hero_rect.y--;
+        if ( key_state[SDL_SCANCODE_A] > 0 ) this.hero_rect.x--;
+        if ( key_state[SDL_SCANCODE_S] > 0 ) this.hero_rect.y++;
+        if ( key_state[SDL_SCANCODE_D] > 0 ) this.hero_rect.x++;
     }
 }
 
