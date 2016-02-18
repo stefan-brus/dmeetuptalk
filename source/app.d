@@ -82,37 +82,59 @@ class SDLGame
                     quit = true;
                     break;
                 }
-                else if ( event.type == SDL_KEYDOWN )
+                else
                 {
-                    this.handleInput();
+                    // Handle the event
+                    this.handle(event);
                 }
-
-                // Clear the window surface by filling it with black pixels
-                auto fill_rect = null; // If the rectangle parameter is null, the whole surface is filled
-                enum CLEAR_COLOR = 0x00000000;
-                enforce(SDL_FillRect(this.window_surface, fill_rect, CLEAR_COLOR) == 0, "Coulnd't clear the window surface");
-
-                // Render our hero onto the center-ish of the window surface
-                auto src_rect = null; // The source rectangle to copy from, null copies the entire surface
-                enforce(SDL_BlitSurface(this.hero_surface, src_rect, this.window_surface, this.hero_rect) == 0, "Couldn't draw the hero surface");
-                enforce(SDL_UpdateWindowSurface(this.window) == 0, "Couldn't update the window surface");
             }
+
+            // Get the number of milliseconds elapsed since SDL was initialized
+            auto ms = SDL_GetTicks();
+            this.update(ms);
+
+            // Render the game
+            this.render();
         }
     }
 
-    // Handle player input
-    void handleInput ( )
+    // Handle an SDL event
+    void handle ( SDL_Event event )
     {
-        // Get the keyboard state so we can handle simultaneous key presses
-        // The parameter is an optional int pointer that receives the length of the returned array - we don't need this at the moment
-        auto key_state = SDL_GetKeyboardState(null);
-        enforce(key_state !is null, "Couldn't get the keyboard state");
+        if ( event.type == SDL_KEYDOWN )
+        {
+            // Get the keyboard state so we can handle simultaneous key presses
+            // The parameter is an optional int pointer that receives the length of the returned array - we don't need this at the moment
+            auto key_state = SDL_GetKeyboardState(null);
+            enforce(key_state !is null, "Couldn't get the keyboard state");
 
-        // Move the hero with WASD
-        if ( key_state[SDL_SCANCODE_W] > 0 ) this.hero_rect.y--;
-        if ( key_state[SDL_SCANCODE_A] > 0 ) this.hero_rect.x--;
-        if ( key_state[SDL_SCANCODE_S] > 0 ) this.hero_rect.y++;
-        if ( key_state[SDL_SCANCODE_D] > 0 ) this.hero_rect.x++;
+            // Move the hero with WASD
+            if ( key_state[SDL_SCANCODE_W] > 0 ) this.hero_rect.y--;
+            if ( key_state[SDL_SCANCODE_A] > 0 ) this.hero_rect.x--;
+            if ( key_state[SDL_SCANCODE_S] > 0 ) this.hero_rect.y++;
+            if ( key_state[SDL_SCANCODE_D] > 0 ) this.hero_rect.x++;
+        }
+    }
+
+    // Update the game state - currently does nothing
+    // It is still present to demonstrate how to create this part of the classic "game loop" set up in D
+    void update ( uint ms )
+    {
+
+    }
+
+    // Render the game
+    void render ( )
+    {
+        // Clear the window surface by filling it with black pixels
+        auto fill_rect = null; // If the rectangle parameter is null, the whole surface is filled
+        enum CLEAR_COLOR = 0x00000000;
+        enforce(SDL_FillRect(this.window_surface, fill_rect, CLEAR_COLOR) == 0, "Coulnd't clear the window surface");
+
+        // Render our hero onto the center-ish of the window surface
+        auto src_rect = null; // The source rectangle to copy from, null copies the entire surface
+        enforce(SDL_BlitSurface(this.hero_surface, src_rect, this.window_surface, this.hero_rect) == 0, "Couldn't draw the hero surface");
+        enforce(SDL_UpdateWindowSurface(this.window) == 0, "Couldn't update the window surface");
     }
 }
 
