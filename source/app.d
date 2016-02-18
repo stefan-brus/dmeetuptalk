@@ -68,9 +68,21 @@ class SDLGame
         enforce(SDL_BlitSurface(this.hero_surface, src_rect, this.window_surface, dst_rect) == 0, "Couldn't draw the hero surface");
         enforce(SDL_UpdateWindowSurface(this.window) == 0, "Couldn't update the window surface");
 
-        // Wait 5 seconds
-        enum DELAY_TIME_MS = 5000;
-        SDL_Delay(DELAY_TIME_MS);
+        // Wait for the player to quit
+        bool quit;
+        SDL_Event event;
+        while ( !quit )
+        {
+            // PollEvent returns 1 while there are events in the queue, 0 if the event queue is empty
+            while ( SDL_PollEvent(&event) != 0 )
+            {
+                if ( event.type == SDL_QUIT )
+                {
+                    quit = true;
+                    break;
+                }
+            }
+        }
     }
 }
 
