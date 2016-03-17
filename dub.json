@@ -1,0 +1,9 @@
+{
+	"name": "dmeetuptalk",
+	"description": "D meetup talk code",
+	"copyright": "Copyright © 2016, Stefan Brus",
+	"authors": ["Stefan Brus"],
+	"dependencies": {
+        "derelict-sdl2":"==1.9.5"
+	}
+}
