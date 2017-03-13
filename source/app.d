@@ -1,11 +1,10 @@
-import derelict.sdl2.image;
-import derelict.sdl2.sdl;
-
-import std.exception;
-import std.string;
+module app;
 
 class SDLGame
 {
+    import derelict.sdl2.image;
+    import derelict.sdl2.sdl;
+
     // The window
     enum WINDOW_WIDTH = 400;
     enum WINDOW_HEIGHT = 400;
@@ -23,6 +22,9 @@ class SDLGame
     // Constructor - initializes resources
     this ( )
     {
+        import std.exception;
+        import std.string;
+
         // Load Derelict's SDL bindings
         DerelictSDL2.load();
 
@@ -101,6 +103,8 @@ class SDLGame
     // Handle an SDL event
     void handle ( SDL_Event event )
     {
+        import std.exception;
+
         if ( event.type == SDL_KEYDOWN )
         {
             // Get the keyboard state so we can handle simultaneous key presses
@@ -126,6 +130,8 @@ class SDLGame
     // Render the game
     void render ( )
     {
+        import std.exception;
+
         // Clear the window surface by filling it with black pixels
         auto fill_rect = null; // If the rectangle parameter is null, the whole surface is filled
         enum CLEAR_COLOR = 0x00000000;
