@@ -18,6 +18,9 @@ class SDLGame ( GameClass : Game )
     // The game
     private Game game;
 
+    // The number of ms elapsed since the last tick
+    private uint elapsed;
+
     // Constructor - initializes resources
     this ( )
     {
@@ -65,6 +68,10 @@ class SDLGame ( GameClass : Game )
     {
         import std.exception;
 
+        // Attempt to smoothen out movement, input, and framerate
+        enum FPS = 75;
+        enum MS_PER_FRAME = 1000 / FPS;
+
         // Wait for the player to quit
         bool quit;
         SDL_Event event;
@@ -83,15 +90,20 @@ class SDLGame ( GameClass : Game )
                 this.game.handle(event);
             }
 
-            // Get the number of milliseconds elapsed since SDL was initialized
-            auto ms = SDL_GetTicks();
-            this.game.update(ms);
+            // Get the number of milliseconds elapsed
+            auto ms_passed = SDL_GetTicks() - this.elapsed;
+            this.game.update(ms_passed);
 
             // Render the game
             this.game.render();
 
             // Update the window surface with newly drawn pixels
             enforce(SDL_UpdateWindowSurface(this.window) == 0, "Couldn't update the window surface");
+
+            // Wait a bit so the game doesn't go too fast
+            if ( ms_passed < MS_PER_FRAME ) SDL_Delay(MS_PER_FRAME - ms_passed);
+
+            this.elapsed += ms_passed;
         }
     }
 }

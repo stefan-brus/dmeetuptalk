@@ -22,4 +22,11 @@ class Paddle : Entity
         enum PADDLE_COLOR = 0xFFFFFF; // white
         enforce(SDL_FillRect(dst, &this.rect, PADDLE_COLOR) == 0, "Couldn't draw a paddle");
     }
+
+    // Get the paddle's movement speed
+    override float speed ( )
+    {
+        // The movement speed of a paddle is constant
+        return 0.4;
+    }
 }

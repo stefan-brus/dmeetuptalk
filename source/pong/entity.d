@@ -11,6 +11,26 @@ abstract class Entity
     // Draw the entity onto the given SDL surface
     abstract void draw ( SDL_Surface* dst );
 
+    // Override this to set the entity's movement speed
+    abstract float speed ( );
+
+    // Move the entity along the given angle (in radians) according to its speed
+    void move ( uint ms, float angle )
+    {
+        import std.math;
+
+        // Calculate the distance moved as a factor of the entity's speed
+        auto d = cast(float)ms * this.speed();
+
+        // Calculate the distance moved along the X and Y axes
+        auto dx = d * cos(angle);
+        auto dy = -d * sin(angle);
+
+        // Update the rectangle
+        this.rect.x += rndtol(dx);
+        this.rect.y += rndtol(dy);
+    }
+
     // Accessor properties for the rectangle's position and size data
 
     // The X position of the entity's top left corner

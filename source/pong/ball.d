@@ -42,4 +42,12 @@ class Ball : Entity
 
         enforce(SDL_BlitSurface(this.surface, null, dst, &this.rect) == 0, "Couldn't blit the ball surface");
     }
+
+    // Get the ball's movement speed
+    override float speed ( )
+    {
+        // The ball's movement speed is currently constant for simplicity
+        // But this will change soon, stay tuned!
+        return 0.3;
+    }
 }
