@@ -31,6 +31,24 @@ abstract class Entity
         this.rect.y += rndtol(dy);
     }
 
+    // Check if this entity collides with the given entity
+    bool collidesWith ( Entity other )
+    {
+        // One could, in theory, use the SDL_IntersectRect function here
+        // But it requires a pointer to an SDL_Rect to write the intersecting
+        // rectangle data to, which is not what we want to do here
+        // Hence, we check each point manually
+        if ( this.x > other.x + other.width || this.x + this.width < other.x ||
+             this.y > other.y + other.height || this.y + this.height < other.y )
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
+
     // Accessor properties for the rectangle's position and size data
 
     // The X position of the entity's top left corner
