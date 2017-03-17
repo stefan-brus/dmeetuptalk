@@ -278,6 +278,7 @@ class PlayState : State
         }
         else if (this.ball.collidesWith(this.player) || this.ball.collidesWith(this.computer) )
         {
+            this.ball.accelerate();
             this.bounceBall(false);
         }
         else
@@ -328,6 +329,7 @@ class PlayState : State
 
         this.ball.x = 390;
         this.ball.y = 190;
+        this.ball.resetSpeed();
 
         this.ball_angle = randomizeBallAngle();
 

@@ -11,6 +11,9 @@ class Ball : Entity
     // The sprite surface
     private SDL_Surface* surface;
 
+    // The ball's current speed
+    private float speed_;
+
     // Constructor
     this ( )
     {
@@ -19,6 +22,8 @@ class Ball : Entity
 
         this.width = 20;
         this.height = 20;
+
+        this.resetSpeed();
 
         // Load the ball sprite
         auto img_path = toStringz("ball.bmp"); // Needs to be a C string so can't be a compile time constant
@@ -46,8 +51,18 @@ class Ball : Entity
     // Get the ball's movement speed
     override float speed ( )
     {
-        // The ball's movement speed is currently constant for simplicity
-        // But this will change soon, stay tuned!
-        return 0.3;
+        return this.speed_;
+    }
+
+    // Reset the ball speed
+    void resetSpeed ( )
+    {
+        this.speed_ = 0.3;
+    }
+
+    // Accelerate the ball
+    void accelerate ( )
+    {
+        this.speed_ += 0.1;
     }
 }
