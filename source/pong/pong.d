@@ -12,6 +12,10 @@ class Pong : Game
     // Reference to the window surface
     private SDL_Surface* window_surface;
 
+    // The "game paused" surface
+    private SDL_Surface* paused_surface;
+    private SDL_Rect paused_rect;
+
     // Is the game paused?
     private bool paused;
 
@@ -24,7 +28,24 @@ class Pong : Game
     // Constructor
     this ( SDL_Surface* window_surface )
     {
+        import derelict.sdl2.image;
+
+        import std.exception;
+        import std.string;
+
         this.window_surface = window_surface;
+
+        // Create the game paused surface
+        auto img_path = toStringz("paused.bmp"); // Needs to be a C string so can't be a compile time constant
+        this.paused_surface = IMG_Load(img_path);
+        enforce(this.paused_surface !is null, "Couldn't create the pause surface");
+        this.paused_rect.x = 0;
+        this.paused_rect.y = 0;
+        this.paused_rect.w = 800;
+        this.paused_rect.h = 400;
+
+        // The paused image's background color, blue, should be considered transparent
+        SDL_SetColorKey(this.paused_surface, SDL_TRUE, SDL_MapRGB(this.paused_surface.format, 0x00, 0x00, 0xFF));
 
         with ( PongStates )
         {
@@ -34,6 +55,13 @@ class Pong : Game
 
             this.cur_state = Intro;
         }
+    }
+
+    // Destructor
+    ~this ( )
+    {
+        // Free the paused surface
+        SDL_FreeSurface(this.paused_surface);
     }
 
     // Handle an SDL event
@@ -80,6 +108,16 @@ class Pong : Game
     // Render the game
     void render ( )
     {
+        import std.exception;
+
+        // Clear the surface by filling it with black pixels
+        auto fill_rect = null; // If the rectangle parameter is null, the whole surface is filled
+        enum CLEAR_COLOR = 0x000000;
+        enforce(SDL_FillRect(this.window_surface, fill_rect, CLEAR_COLOR) == 0, "Couldn't clear the game");
+
         this.states[this.cur_state].render(this.window_surface);
+
+        if ( this.paused )
+            enforce(SDL_BlitSurface(this.paused_surface, null, this.window_surface, &this.paused_rect) == 0, "Couldn't blit the pause surface");
     }
 }

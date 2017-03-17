@@ -311,11 +311,6 @@ class PlayState : State
     {
         import std.exception;
 
-        // Clear the surface by filling it with black pixels
-        auto fill_rect = null; // If the rectangle parameter is null, the whole surface is filled
-        enum CLEAR_COLOR = 0x000000;
-        enforce(SDL_FillRect(dst, fill_rect, CLEAR_COLOR) == 0, "Couldn't clear the game");
-
         // Draw the game entities
         this.player.draw(dst);
         this.computer.draw(dst);
