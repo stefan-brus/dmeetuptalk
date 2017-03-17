@@ -167,6 +167,7 @@ class PlayState : State
     import pong.boundary;
     import pong.paddle;
 
+    import derelict.sdl2.mixer;
     import derelict.sdl2.sdl;
 
     import std.math;
@@ -191,6 +192,9 @@ class PlayState : State
     private Boundary bound_left;
     private Boundary bound_right;
 
+    // The bleep sound effect
+    private Mix_Chunk* bleep;
+
     // The ball's current angle
     private float ball_angle;
 
@@ -205,6 +209,9 @@ class PlayState : State
     // Constructor
     this ( )
     {
+        import std.exception;
+        import std.string;
+
         // Create the paddles and move them to their initial positions
         this.player = new Paddle();
         this.player.x = 20;
@@ -225,8 +232,20 @@ class PlayState : State
         this.bound_left = new Boundary(0, 0, 0, 400);
         this.bound_right = new Boundary(800, 0, 0, 400);
 
+        // Load the bleep sound effect
+        auto bleep_path = toStringz("bleep.wav"); // Needs to be a C string so can't be a compile time constant
+        this.bleep = Mix_LoadWAV(bleep_path);
+        enforce(this.bleep !is null, "Couldn't load bleep sound");
+
         // Randomize the ball's starting angle
         this.ball_angle = randomizeBallAngle();
+    }
+
+    // Destructor
+    ~this ( )
+    {
+        // Free the bleep sound effect
+        Mix_FreeChunk(this.bleep);
     }
 
     // Handle an SDL event
@@ -341,7 +360,17 @@ class PlayState : State
     {
         // If the ball hit one of the upper boundaries, the coefficient should be 2PI, otherwise PI
         auto coeff = vertical_hit ? 2 : 1;
-        if ( !this.ball_collided ) this.ball_angle = coeff * PI - this.ball_angle;
+
+        if ( !this.ball_collided )
+        {
+            this.ball_angle = coeff * PI - this.ball_angle;
+
+            // Bleep!
+            enum CHANNEL = -1; // -1 for first available channel
+            enum LOOPS = 0; // We don't want to loop the sound
+            Mix_PlayChannel(CHANNEL, this.bleep, LOOPS);
+        }
+
         this.ball_collided = true;
     }
 

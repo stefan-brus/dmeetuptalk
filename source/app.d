@@ -5,6 +5,7 @@ import pong.game;
 class SDLGame ( GameClass : Game )
 {
     import derelict.sdl2.image;
+    import derelict.sdl2.mixer;
     import derelict.sdl2.sdl;
 
     // The window
@@ -33,9 +34,18 @@ class SDLGame ( GameClass : Game )
         // Load Derelict's SDL_Image bindings
         DerelictSDL2Image.load();
 
+        // Load Derelict's SDL_Mixer bindings
+        DerelictSDL2Mixer.load();
+
         // Initialize SDL
         enum INIT_FLAGS = SDL_INIT_EVERYTHING;
         enforce(SDL_Init(INIT_FLAGS) == 0, "Couldn't initialize SDL");
+
+        // Initialize SDL_Mixer
+        enum FREQUENCY = 22500;
+        enum CHANNELS = 2;
+        enum CHUNK_SIZE = 4096;
+        enforce(Mix_OpenAudio(FREQUENCY, MIX_DEFAULT_FORMAT, CHANNELS, CHUNK_SIZE) == 0, "Couldn't initialize mixer");
 
         // Create our window where we render stuff
         auto window_title = toStringz("Pongelipong!"); // Needs to be a C string so can't be a compile time constant
@@ -61,6 +71,9 @@ class SDLGame ( GameClass : Game )
 
         // Destroy the window
         SDL_DestroyWindow(this.window);
+
+        // Close the audio mixer
+        Mix_CloseAudio();
     }
 
     // Run the game
